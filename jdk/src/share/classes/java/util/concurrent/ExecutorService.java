@@ -134,6 +134,9 @@ import java.util.Collection;
  * @since 1.5
  * @author Doug Lea
  */
+/**
+ * 扩展Executor接口，添加一下用于管理执行期生命周期的方法
+ */
 public interface ExecutorService extends Executor {
 
     /**

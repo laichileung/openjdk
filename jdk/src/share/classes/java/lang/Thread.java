@@ -140,6 +140,9 @@ import sun.security.util.SecurityConstants;
 public
 class Thread implements Runnable {
     /* Make sure registerNatives is the first thing <clinit> does. */
+    /**
+     * 注册Thread.c里面的local method
+     */
     private static native void registerNatives();
     static {
         registerNatives();
@@ -154,6 +157,9 @@ class Thread implements Runnable {
     private boolean     single_step;
 
     /* Whether or not the thread is a daemon thread. */
+    /**
+     *  记录该线程是否守护进程
+     */
     private boolean     daemon = false;
 
     /* JVM state */
@@ -163,6 +169,9 @@ class Thread implements Runnable {
     private Runnable target;
 
     /* The group of this thread */
+    /**
+     * 线程组 方便管理线程
+     */
     private ThreadGroup group;
 
     /* The context ClassLoader for this thread */
@@ -243,6 +252,7 @@ class Thread implements Runnable {
 
     /**
      * The minimum priority that a thread can have.
+     * 最小优先级
      */
     public final static int MIN_PRIORITY = 1;
 
@@ -253,6 +263,7 @@ class Thread implements Runnable {
 
     /**
      * The maximum priority that a thread can have.
+     * 最大优先级
      */
     public final static int MAX_PRIORITY = 10;
 
@@ -373,6 +384,9 @@ class Thread implements Runnable {
 
         Thread parent = currentThread();
         SecurityManager security = System.getSecurityManager();
+        /**
+         * 设置线程组
+         */
         if (g == null) {
             /* Determine if it's an applet or not */
 
@@ -391,10 +405,16 @@ class Thread implements Runnable {
 
         /* checkAccess regardless of whether or not threadgroup is
            explicitly passed in. */
+        /**
+         * 检查线程组是否可达
+         */
         g.checkAccess();
 
         /*
          * Do we have the required permissions?
+         */
+        /**
+         * 检查是否有权限
          */
         if (security != null) {
             if (isCCLOverridden(getClass())) {
@@ -405,8 +425,8 @@ class Thread implements Runnable {
         g.addUnstarted();
 
         this.group = g;
-        this.daemon = parent.isDaemon();
-        this.priority = parent.getPriority();
+        this.daemon = parent.isDaemon();    // 是否守护线程
+        this.priority = parent.getPriority();   //优先级
         if (security == null || isCCLOverridden(parent.getClass()))
             this.contextClassLoader = parent.getContextClassLoader();
         else
@@ -698,18 +718,25 @@ class Thread implements Runnable {
      */
     public synchronized void start() {
         /**
+         *
+         * 对于main方法线程(即运行main方法的线程)，或者是由虚拟机创建的“system”组的
+         * 线程，都不需要调用此方法来启动。
+         * 任何在这个方法中添加的新功能，以后都有可能添加到虚拟机上。
+         *
          * This method is not invoked for the main method thread or "system"
          * group threads created/set up by the VM. Any new functionality added
          * to this method in the future may have to also be added to the VM.
          *
-         * A zero status value corresponds to state "NEW".
+         * 若线程的threadStatus为0，则表明这个状态是NEW状态
          */
         if (threadStatus != 0)
             throw new IllegalThreadStateException();
 
-        /* Notify the group that this thread is about to be started
-         * so that it can be added to the group's list of threads
-         * and the group's unstarted count can be decremented. */
+        /**
+         * 通知线程组：此线程已经就绪，可以开始运行了
+         * 所以，这条线程可以添加到线程组的线程list中，以及线程组
+         * 未开始线程的数目(he group's unstarted count)可以减一了。
+         */
         group.add(this);
 
         boolean started = false;

@@ -85,6 +85,10 @@ public class Executors {
      * @return the newly created thread pool
      * @throws IllegalArgumentException if {@code nThreads <= 0}
      */
+    /**
+     * 指定线程数的线程池，即使线程空闲，也不会释放线程
+     *
+     */
     public static ExecutorService newFixedThreadPool(int nThreads) {
         return new ThreadPoolExecutor(nThreads, nThreads,
                                       0L, TimeUnit.MILLISECONDS,
@@ -167,6 +171,10 @@ public class Executors {
      *
      * @return the newly created single-threaded Executor
      */
+    /**
+     * 线程池中只有一个线程，如果该线程异常结束，
+     * 会重新创建一个新的线程继续执行任务，唯一的线程可以保证所提交任务的顺序执行
+     */
     public static ExecutorService newSingleThreadExecutor() {
         return new FinalizableDelegatedExecutorService
             (new ThreadPoolExecutor(1, 1,
@@ -211,6 +219,11 @@ public class Executors {
      * may be created using {@link ThreadPoolExecutor} constructors.
      *
      * @return the newly created thread pool
+     */
+    /**
+     * 缓存线程的线程池，在没有任务执行时，
+     * 当线程的空闲时间超过keepAliveTime，会自动释放线程资源，
+     * 当提交新任务时，如果没有空闲线程，则创建新线程执行任务。
      */
     public static ExecutorService newCachedThreadPool() {
         return new ThreadPoolExecutor(0, Integer.MAX_VALUE,
